@@ -22,5 +22,5 @@ case class PatientDetails(val lastName: String, val socialSecurityNumber: String
 
 case class VisitCompleted(dispatcher: ActorRef)
 
-object ContentEnricherDriver {
+object ContentEnricherDriver extends CompletableApp(3) {
 }
