@@ -24,3 +24,25 @@ case class VisitCompleted(dispatcher: ActorRef)
 
 object ContentEnricherDriver extends CompletableApp(3) {
 }
+
+class AccountingEnricherDispatcher(val accountingSystemDispatcher: ActorRef) extends Actor {
+  def receive = {
+    case doctorVisitCompleted: DoctorVisitCompleted =>
+      println("AccountingEnricherDispatcher: querying and forarding.")
+      // query the enriching patient information...
+      // ...
+      val lastName = "Doe"
+      val carrier = "Kaiser"
+      val socialSecurityNumber = "111-22-3333"
+      val enrichedDoctorVisitCompleted = DoctorVisitCompleted(
+        doctorVisitCompleted.patientId,
+        doctorVisitCompleted.firstName,
+        doctorVisitCompleted.date,
+        PatientDetails(lastName, socialSecurityNumber, carrier)
+      )
+      accountingSystemDispatcher forward enrichedDoctorVisitCompleted
+      ContentEnricherDriver.completedStep()
+    case _ =>
+      println("AccountEnricherDispatcher: received unexpected message")
+  }
+}
