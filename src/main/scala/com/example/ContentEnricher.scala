@@ -2,6 +2,7 @@ package com.example
 
 import java.util.Date
 
+import akka.actor.Actor.Receive
 import akka.actor._
 
 case class DoctorVisitCompleted(
@@ -54,5 +55,19 @@ class AccountingSystemDispatcher extends Actor {
       ContentEnricherDriver.completedStep()
     case _ =>
       println("AccountingSystemDispatcher: received unexpected message")
+  }
+}
+
+class ScheduledDoctorVisit(val patientId: String, val firstName: String) extends Actor {
+  var completeOn: Date = _
+
+  override def receive: Receive = {
+    case visitCompleted: VisitCompleted =>
+      println("ScheduledDoctorVisit: completing visit.")
+      completeOn = new Date()
+      visitCompleted.dispatcher ! new DoctorVisitCompleted(patientId, firstName, completeOn)
+      ContentEnricherDriver.completedStep()
+    case _ =>
+      println("ScheduledDoctorVisit: received unexpected message")
   }
 }
