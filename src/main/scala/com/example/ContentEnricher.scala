@@ -46,3 +46,13 @@ class AccountingEnricherDispatcher(val accountingSystemDispatcher: ActorRef) ext
       println("AccountEnricherDispatcher: received unexpected message")
   }
 }
+
+class AccountingSystemDispatcher extends Actor {
+  def receive = {
+    case doctorVisitCompleted: DoctorVisitCompleted =>
+      println("AccountingSystemDispatcher: sending to Accounting System...")
+      ContentEnricherDriver.completedStep()
+    case _ =>
+      println("AccountingSystemDispatcher: received unexpected message")
+  }
+}
