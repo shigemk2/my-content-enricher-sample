@@ -24,6 +24,13 @@ case class PatientDetails(val lastName: String, val socialSecurityNumber: String
 case class VisitCompleted(dispatcher: ActorRef)
 
 object ContentEnricherDriver extends CompletableApp(3) {
+  val accountingSystemDispatcher = system.actorOf(Props[AccountingSystemDispatcher], "accountingSystem")
+  val accountingEnricherDispatcher = system.actorOf(Props(classOf[AccountingEnricherDispatcher], accountingEnricherDispatcher), "accountingDispatcher")
+  val scheduledDoctorVisit = system.actorOf(Props(classOf[ScheduledDoctorVisit], "123456789", "John", "scheduleVisit"))
+  scheduledDoctorVisit ! VisitCompleted(accountingEnricherDispatcher)
+
+  awaitCompletion
+  println("ContentEnricher: is completed.")
 }
 
 class AccountingEnricherDispatcher(val accountingSystemDispatcher: ActorRef) extends Actor {
